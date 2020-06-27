@@ -112,6 +112,39 @@ public class FileDAO {
        WED201c:
                DatLHHE141658-DatLHHE141658@fpt.edu.vn-21.81-Ok 
     */
+
+    public static boolean writeCSVFile(String fileName, HashMap<Campus, List<Subject>> info){
+        PrintWriter writer = null;
+        try{
+            int i = 1;
+            writer = new PrintWriter(new File(fileName));
+            writer.println("No,Full Name,Email,External Id,Campus,Sub,Total Learning Hours,Status (after 4 weeks)");
+            for (Campus campus : info.keySet()) {
+                for (Subject subject : info.get(campus)) {
+                    for (Student student : subject.getListOfStudent()) {
+                        writer.println(i++ +","
+                                        + student.getFullName() + ","
+                                        + student.getEmail() + ","
+                                        + student.getExternalId() +","
+                                        + campus +","
+                                        + subject +","
+                                        + student.getTotalLearning() +","
+                                        + student.getStatus());
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }finally {
+            try{
+                if(writer != null) writer.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
     public static boolean writeFile(String filename, HashMap<Campus, List<Subject>> info)
     {
         PrintWriter writer = null;

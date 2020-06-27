@@ -28,17 +28,12 @@ public class MainFrame extends javax.swing.JFrame {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     ArrayList<Campus> campuses = new ArrayList<>(); //key set of info but have index .-.
 
-
-
     boolean isForNew = false;
     boolean isForEdit = false;
-
 
     /**
      * Creates new form MainFrame
      */
-
-
     public MainFrame() {
         initComponents();
         information.getData();
@@ -88,7 +83,7 @@ public class MainFrame extends javax.swing.JFrame {
         }else if(isForEdit){
             updateStudent();
         }
-        FileDAO.writeFile("nah.txt", information.getInfo());
+        FileDAO.writeCSVFile("nah.csv", information.getInfo());
     }
     private void deleteStudent(ActionEvent actionEvent) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
