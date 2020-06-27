@@ -107,7 +107,7 @@ public class MainFrame extends javax.swing.JFrame {
             double hours = Double.parseDouble(this.txtLearningHours.getText());
             String campus = Objects.requireNonNull(this.cbxCampus.getSelectedItem()).toString();
             String subject = Objects.requireNonNull(this.cbxSubject.getSelectedItem()).toString();
-            String status = null;
+            String status;
             if (this.isOK.isSelected()) status = "Ok";
             else status = "Not Ok";
             String externalId =  subject + "-" + campus + "-" + Student.getStudentID(name);
@@ -143,18 +143,16 @@ public class MainFrame extends javax.swing.JFrame {
         if (selectionPath == null) return;
 
         Object[] path = selectionPath.getPath();
+        if(path.length < 4) return;
         ArrayList<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
         for (Object o : path) treeNodes.add((DefaultMutableTreeNode) o);
 
         Campus instantCampus = null;
         Subject instantSubject = null;
         Student instantStudent = null;
-
-        for (DefaultMutableTreeNode treeNode : treeNodes){
-            if (treeNode.getUserObject() instanceof Campus) instantCampus = (Campus) treeNode.getUserObject();
-            if(treeNode.getUserObject() instanceof Subject) instantSubject = (Subject) treeNode.getUserObject();
-            if (treeNode.getUserObject() instanceof Student) instantStudent = (Student) treeNode.getUserObject();
-        }
+        if (treeNodes.get(1).getUserObject() instanceof Campus) instantCampus = (Campus) treeNodes.get(1).getUserObject();
+        if(treeNodes.get(2).getUserObject() instanceof Subject) instantSubject = (Subject) treeNodes.get(2).getUserObject();
+        if (treeNodes.get(3).getUserObject() instanceof Student) instantStudent = (Student) treeNodes.get(3).getUserObject();
 
         this.cbxCampus.setSelectedIndex(campuses.indexOf(instantCampus));
         List<Subject> subjects = information.getInfo().get(instantCampus);
