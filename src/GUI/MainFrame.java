@@ -5,13 +5,15 @@
  */
 package GUI;
 
-import DTO.*;
+import DTO.Campus;
+import DTO.Information;
+import DTO.Student;
+import DTO.Subject;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -93,7 +95,8 @@ public class MainFrame extends javax.swing.JFrame {
             if(option == JOptionPane.YES_OPTION){
                 DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) parent.getUserObject();
-                parent.remove(node);
+                DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
+                model.removeNodeFromParent(node);
                 subject.getListOfStudent().remove(student);
                 this.jScrollPane1.repaint();
             }
@@ -424,11 +427,7 @@ public class MainFrame extends javax.swing.JFrame {
             e.printStackTrace();
         }
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
