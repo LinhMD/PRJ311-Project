@@ -155,7 +155,6 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         this.jTree1.setModel(new DefaultTreeModel(root));
-
     }
 
     private void treeSelected(TreeSelectionEvent event) {
