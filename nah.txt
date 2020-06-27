@@ -112,7 +112,6 @@ DN:
         Tandnds150175
         kanayods150223
         Kawaguchids150224
-        linhmdse140063
   WED201c:
          thongnphDE130065
          QuangNCDE130079
@@ -1208,10 +1207,7 @@ HN:
          quynhktse06189
   PRP201:
         QuangVTHE130182
-        NghiaDTHE130296
-        QuanVHHE130299
         MaiNNHE130454
-        ChungLTHE130663
   SSL101:
         HuongNGHA140304
         LinhVKHA150007

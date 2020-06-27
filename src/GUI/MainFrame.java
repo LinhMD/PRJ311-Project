@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import DAO.FileDAO;
 import DTO.Campus;
 import DTO.Information;
 import DTO.Student;
@@ -49,9 +50,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void enableStuff(Boolean identify, Boolean allElse){
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
-        this.txtLearningHours.setEnabled(allElse);
         this.cbxSubject.setEnabled(identify);
         this.cbxCampus.setEnabled(identify);
+
+        this.txtLearningHours.setEnabled(allElse);
         this.isOK.setEnabled(allElse);
     }
 
@@ -86,6 +88,7 @@ public class MainFrame extends javax.swing.JFrame {
         }else if(isForEdit){
             updateStudent();
         }
+        FileDAO.writeFile("nah.txt", information.getInfo());
     }
     private void deleteStudent(ActionEvent actionEvent) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
@@ -98,6 +101,7 @@ public class MainFrame extends javax.swing.JFrame {
                 DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
                 model.removeNodeFromParent(node);
                 subject.getListOfStudent().remove(student);
+                System.out.println(parent.getIndex(node));
                 this.jScrollPane1.repaint();
             }
         }else{
@@ -118,6 +122,7 @@ public class MainFrame extends javax.swing.JFrame {
                     status = "Not OK";
                 student.setTotalLearning(hours);
                 student.setStatus(status);
+
                 enableStuff(false, false);
                 isForEdit = isForNew = false;
                 JOptionPane.showMessageDialog(null,"Update successfully");
@@ -131,18 +136,21 @@ public class MainFrame extends javax.swing.JFrame {
     private void saveNewStudent() {
         Student student = getStudent();
         if(student == null) return;
+
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
         List<Subject> subjects = information.getInfo().get(campus);
         Subject subject = subjects.get(cbxSubject.getSelectedIndex());
         subject.getListOfStudent().add(student);
+
         DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) root.getChildAt(campuses.indexOf(campus)).getChildAt(subjects.indexOf(subject));
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
         subjectNode.add(node);
+
         this.jScrollPane1.repaint();
         isForEdit = isForNew = false;
         enableStuff(false, false);
-        JOptionPane.showMessageDialog(null, "Add Student successfully");
 
+        JOptionPane.showMessageDialog(null, "Add Student successfully");
     }
 
     private Student getStudent() {
@@ -157,6 +165,7 @@ public class MainFrame extends javax.swing.JFrame {
             if (this.isOK.isSelected()) status = "Ok";
             else status = "Not Ok";
             String externalId =  subject + "-" + campus + "-" + Student.getStudentID(name);
+
             student = new Student(name, email, externalId, campus, hours, status);
         }catch (Exception e){
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -264,26 +273,26 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("HN");
-        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("HRM201c");
-        javax.swing.tree.DefaultMutableTreeNode treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("xxx");
-        treeNode3.add(treeNode4);
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("WED201c");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("PMG201c");
-        treeNode2.add(treeNode3);
-        treeNode1.add(treeNode2);
-        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("SG");
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("HRM201c");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("WED201c");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("PMG201c");
-        treeNode2.add(treeNode3);
-        treeNode1.add(treeNode2);
-        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+//        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+//        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("HN");
+//        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("HRM201c");
+//        javax.swing.tree.DefaultMutableTreeNode treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("xxx");
+//        treeNode3.add(treeNode4);
+//        treeNode2.add(treeNode3);
+//        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("WED201c");
+//        treeNode2.add(treeNode3);
+//        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("PMG201c");
+//        treeNode2.add(treeNode3);
+//        treeNode1.add(treeNode2);
+//        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("SG");
+//        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("HRM201c");
+//        treeNode2.add(treeNode3);
+//        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("WED201c");
+//        treeNode2.add(treeNode3);
+//        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("PMG201c");
+//        treeNode2.add(treeNode3);
+//        treeNode1.add(treeNode2);
+//        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jTree1.addTreeSelectionListener(this::treeSelected);
         jScrollPane1.setViewportView(jTree1);
 
@@ -299,13 +308,13 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel3.setText("Campus");
 
-        cbxCampus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HN", "SG", "DN", "CT" }));
+//        cbxCampus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HN", "SG", "DN", "CT" }));
         cbxCampus.setEnabled(false);
         cbxCampus.addActionListener(this::loadSubject);
 
         jLabel4.setText("Subject");
 
-        cbxSubject.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HRM201c", "PMG201", "WED201c" }));
+//        cbxSubject.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HRM201c", "PMG201", "WED201c" }));
         cbxSubject.setEnabled(false);
 
         jLabel5.setText("Total learning");
