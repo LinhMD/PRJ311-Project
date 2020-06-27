@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -84,6 +85,22 @@ public class MainFrame extends javax.swing.JFrame {
             updateStudent();
         }
     }
+    private void deleteStudent(ActionEvent actionEvent) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+        if(node.getUserObject() instanceof Student) {
+            Student student = (Student) node.getUserObject();
+            int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + student.getFullName() + " student?");
+            if(option == JOptionPane.YES_OPTION){
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+                Subject subject = (Subject) parent.getUserObject();
+                parent.remove(node);
+                subject.getListOfStudent().remove(student);
+                this.jScrollPane1.repaint();
+            }
+        }else{
+            JOptionPane.showMessageDialog(null, "Please select a student");
+        }
+    }
 
     private void updateStudent() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
@@ -100,10 +117,12 @@ public class MainFrame extends javax.swing.JFrame {
                 student.setStatus(status);
                 enableStuff(false, false);
                 isForEdit = isForNew = false;
+                JOptionPane.showMessageDialog(null,"Update successfully");
             }catch (NumberFormatException e){
                 JOptionPane.showMessageDialog(null, "Learning hours invalid");
             }
-        }
+        }else
+            JOptionPane.showMessageDialog(null, "Please choose a student");
     }
 
     private void saveNewStudent() {
@@ -114,10 +133,13 @@ public class MainFrame extends javax.swing.JFrame {
         Subject subject = subjects.get(cbxSubject.getSelectedIndex());
         subject.getListOfStudent().add(student);
         DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) root.getChildAt(campuses.indexOf(campus)).getChildAt(subjects.indexOf(subject));
-        subjectNode.add(new DefaultMutableTreeNode(student));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
+        subjectNode.add(node);
         this.jScrollPane1.repaint();
         isForEdit = isForNew = false;
         enableStuff(false, false);
+        JOptionPane.showMessageDialog(null, "Add Student successfully");
+
     }
 
     private Student getStudent() {
@@ -179,6 +201,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.loadSubject(subjects);
         this.cbxSubject.setSelectedIndex(subjects.indexOf(instantSubject));
         this.loadStudentInfo(instantStudent);
+    }
+
+    private void loadSubject(ActionEvent actionEvent) {
+        Campus campus = campuses.get(cbxCampus.getSelectedIndex());
+        List<Subject> subjects = information.getInfo().get(campus);
+        this.loadSubject(subjects);
     }
 
     private void loadCampus(){
@@ -293,7 +321,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnSave.addActionListener(this::save);
 
         btnDelete.setText("Delete");
-        //TODO: delete
+        btnDelete.addActionListener(this::deleteStudent);
 
         btnNew.setText("New");
         btnNew.addActionListener(this::btnNewAction);
@@ -383,11 +411,7 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void loadSubject(ActionEvent actionEvent) {
-        Campus campus = campuses.get(cbxCampus.getSelectedIndex());
-        List<Subject> subjects = information.getInfo().get(campus);
-        this.loadSubject(subjects);
-    }
+
 
 
     /**
