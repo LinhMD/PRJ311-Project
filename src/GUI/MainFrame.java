@@ -47,8 +47,8 @@ public class MainFrame extends javax.swing.JFrame {
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
         this.txtLearningHours.setEnabled(allElse);
-        this.cbxSubject.setEnabled(allElse);
-        this.cbxCampus.setEnabled(allElse);
+        this.cbxSubject.setEnabled(identify);
+        this.cbxCampus.setEnabled(identify);
         this.isOK.setEnabled(allElse);
     }
 
@@ -81,7 +81,28 @@ public class MainFrame extends javax.swing.JFrame {
         if(isForNew){
             saveNewStudent();
         }else if(isForEdit){
+            updateStudent();
+        }
+    }
 
+    private void updateStudent() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+        if(node.getUserObject() instanceof Student){
+            Student student = (Student) node.getUserObject();
+            try {
+                double hours = Double.parseDouble(this.txtLearningHours.getText());
+                String status;
+                if(this.isOK.isSelected())
+                    status = "Ok";
+                else
+                    status = "Not OK";
+                student.setTotalLearning(hours);
+                student.setStatus(status);
+                enableStuff(false, false);
+                isForEdit = isForNew = false;
+            }catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null, "Learning hours invalid");
+            }
         }
     }
 
@@ -256,11 +277,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         cbxSubject.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HRM201c", "PMG201", "WED201c" }));
         cbxSubject.setEnabled(false);
-        cbxSubject.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbxSubjectActionPerformed(evt);
-            }
-        });
 
         jLabel5.setText("Total learning");
 
@@ -375,14 +391,10 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
 
-    private void cbxSubjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSubjectActionPerformed
-
-    }//GEN-LAST:event_cbxSubjectActionPerformed
-
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try{
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException | ClassNotFoundException e) {
