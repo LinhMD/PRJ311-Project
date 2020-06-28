@@ -87,16 +87,15 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void deleteStudent(ActionEvent actionEvent) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
-        if(node.getUserObject() instanceof Student) {
+        if (node.getUserObject() instanceof Student) {
             Student student = (Student) node.getUserObject();
             int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + student.getFullName() + " student?");
-            if(option == JOptionPane.YES_OPTION){
+            if (option == JOptionPane.YES_OPTION) {
                 DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) parent.getUserObject();
                 DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
                 model.removeNodeFromParent(node);
                 subject.getListOfStudent().remove(student);
-                System.out.println(parent.getIndex(node));
                 this.jScrollPane1.repaint();
             }
         }else{
@@ -106,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void updateStudent() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
-        if(node.getUserObject() instanceof Student){
+        if (node.getUserObject() instanceof Student){
             Student student = (Student) node.getUserObject();
             try {
                 double hours = Double.parseDouble(this.txtLearningHours.getText());
@@ -130,7 +129,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void saveNewStudent() {
         Student student = getStudent();
-        if(student == null) return;
+        if (student == null) return;
 
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
         List<Subject> subjects = information.getInfo().get(campus);
@@ -192,7 +191,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (selectionPath == null) return;
 
         Object[] path = selectionPath.getPath();
-        if(path.length < 4) return;
+        if (path.length < 4) return;
         ArrayList<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
         for (Object o : path) treeNodes.add((DefaultMutableTreeNode) o);
 
@@ -200,7 +199,7 @@ public class MainFrame extends javax.swing.JFrame {
         Subject instantSubject = null;
         Student instantStudent = null;
         if (treeNodes.get(1).getUserObject() instanceof Campus) instantCampus = (Campus) treeNodes.get(1).getUserObject();
-        if(treeNodes.get(2).getUserObject() instanceof Subject) instantSubject = (Subject) treeNodes.get(2).getUserObject();
+        if (treeNodes.get(2).getUserObject() instanceof Subject) instantSubject = (Subject) treeNodes.get(2).getUserObject();
         if (treeNodes.get(3).getUserObject() instanceof Student) instantStudent = (Student) treeNodes.get(3).getUserObject();
 
         this.cbxCampus.setSelectedIndex(campuses.indexOf(instantCampus));

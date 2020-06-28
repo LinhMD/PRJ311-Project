@@ -20,7 +20,7 @@ public class FileDAO {
     public static List<Campus> loadCampusFromFile(String filename)
     {
         //only load campus name from file
-        //return List of Campus'names
+        //return List of Campus's names
         Set<Campus> campus = new TreeSet<>();
         BufferedReader bufferedReader = null;
         try {
@@ -50,7 +50,7 @@ public class FileDAO {
             if (reader.ready()) reader.readLine();
             while (reader.ready()) {
                 String[] arr = reader.readLine().split(",");
-                subjects.add( new Subject(arr[5]));
+                subjects.add(new Subject(arr[5]));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,8 +76,8 @@ public class FileDAO {
 
                     students.add( new Student(arr[1], arr[2], arr[3], arr[4], Double.parseDouble(arr[6]), arr[7]));
                 } catch (Exception e){
-                    System.out.println(arr[7]);
-//                    e.printStackTrace();
+//                    System.out.println(arr[7]);
+                    e.printStackTrace();
 //                    System.err.println(e.getMessage());
                 }
             }
@@ -93,7 +93,7 @@ public class FileDAO {
         return students;
     }
     //Write list of students to given filename
-    //fomat like as: 
+    //format like as:
     /* Campus:
               Subject:
                     FullName - Email - TotalLearning - Status
@@ -119,20 +119,18 @@ public class FileDAO {
             int i = 1;
             writer = new PrintWriter(new File(fileName));
             writer.println("No,Full Name,Email,External Id,Campus,Sub,Total Learning Hours,Status (after 4 weeks)");
-            for (Campus campus : info.keySet()) {
-                for (Subject subject : info.get(campus)) {
-                    for (Student student : subject.getListOfStudent()) {
-                        writer.println(i++ +","
-                                        + student.getFullName() + ","
-                                        + student.getEmail() + ","
-                                        + student.getExternalId() +","
-                                        + campus +","
-                                        + subject +","
-                                        + student.getTotalLearning() +","
-                                        + student.getStatus());
-                    }
-                }
-            }
+            for (Campus campus : info.keySet())
+                for (Subject subject : info.get(campus))
+                    for (Student student : subject.getListOfStudent())
+                        writer.println(i++ + ","
+                                + student.getFullName() + ","
+                                + student.getEmail() + ","
+                                + student.getExternalId() + ","
+                                + campus + ","
+                                + subject + ","
+                                + student.getTotalLearning() + ","
+                                + student.getStatus()
+                        );
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return false;

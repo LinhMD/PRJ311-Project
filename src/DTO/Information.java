@@ -16,7 +16,7 @@ import java.util.List;
  * @author user
  */
 public class Information {
-    private HashMap<Campus,List<Subject>> info;
+    private final HashMap<Campus,List<Subject>> info;
 
     public static String FILE_NAME = "nah.csv";
     public static List<Campus> campuses = FileDAO.loadCampusFromFile(FILE_NAME);
