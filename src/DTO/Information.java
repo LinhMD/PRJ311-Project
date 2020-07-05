@@ -7,8 +7,7 @@ package DTO;
 
 import DAO.FileDAO;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +59,7 @@ public class Information {
         }
     }
     public void printInfo(OutputStream stream){
+        System.out.println("1");
         PrintWriter writer = new PrintWriter(stream);
         for (Campus campus : info.keySet()) {
             writer.println(campus.getName() + ":");
@@ -70,16 +70,25 @@ public class Information {
                 for (Student student : subject.getListOfStudent()) {
                     String studentTabSpace = campusTabSpace + " ".repeat(subject.getName().length());
                     writer.println(studentTabSpace + student);
+                    System.out.println("nah");
                 }
             }
         }
+        writer.close();
+        System.out.println("here");
     }
     
     public static void main(String[] args) {
         Information information = new Information();
         information.getData();
         information.printInfo(System.out);
-        FileDAO.writeFile("nah.txt",information.info);
+//        FileDAO.writeFile("nah.txt",information.info);
+//        try {
+//            information.printInfo(new FileOutputStream(new File("nah.txt")));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
+        System.out.println("nah");
     }
 }
