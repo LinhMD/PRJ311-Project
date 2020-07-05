@@ -7,6 +7,8 @@ package DTO;
 
 import DAO.FileDAO;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,16 +59,17 @@ public class Information {
             this.addCampus(campus,list);
         }
     }
-    public void printInfo(){
+    public void printInfo(OutputStream stream){
+        PrintWriter writer = new PrintWriter(stream);
         for (Campus campus : info.keySet()) {
-            System.out.println(campus.getName() + ":");
+            writer.println(campus.getName() + ":");
             for (Subject subject : info.get(campus)) {
                 StringBuilder campusTabSpace = new StringBuilder();
                 campusTabSpace.append(" ".repeat(campus.getName().length()));
-                System.out.println(campusTabSpace.toString() + subject.getName() + ":");
+                writer.println(campusTabSpace.toString() + subject.getName() + ":");
                 for (Student student : subject.getListOfStudent()) {
                     String studentTabSpace = campusTabSpace + " ".repeat(subject.getName().length());
-                    System.out.println(studentTabSpace + student);
+                    writer.println(studentTabSpace + student);
                 }
             }
         }
@@ -75,7 +78,8 @@ public class Information {
     public static void main(String[] args) {
         Information information = new Information();
         information.getData();
-        information.printInfo();
+        information.printInfo(System.out);
         FileDAO.writeFile("nah.txt",information.info);
+
     }
 }

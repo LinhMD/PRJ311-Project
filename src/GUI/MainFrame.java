@@ -209,7 +209,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.loadStudentInfo(instantStudent);
     }
 
-    private void loadSubject(ActionEvent actionEvent) {
+    private void campusSelected(ActionEvent actionEvent) {
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
         List<Subject> subjects = information.getInfo().get(campus);
         this.loadSubject(subjects);
@@ -304,7 +304,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 //        cbxCampus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HN", "SG", "DN", "CT" }));
         cbxCampus.setEnabled(false);
-        cbxCampus.addActionListener(this::loadSubject);
+        cbxCampus.addActionListener(this::campusSelected);
 
         jLabel4.setText("Subject");
 

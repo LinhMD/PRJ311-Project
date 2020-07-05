@@ -29,7 +29,6 @@ public class Subject implements Comparable<Subject>{
     }
 
     public Subject( String Name) {
-   
         this.Name = Name;
         this.listOfStudent = new ArrayList<>();
     }
