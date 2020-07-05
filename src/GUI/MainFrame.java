@@ -24,8 +24,8 @@ import java.util.*;
  * @author user
  */
 public class MainFrame extends javax.swing.JFrame {
-    Information information = new Information();
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+    Information information = new Information(); //data model?
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("root"); //tree model, use for jTree(show to user)
     ArrayList<Campus> campuses = new ArrayList<>(); //key set of info but have index .-.
 
     boolean isForNew = false;
@@ -42,6 +42,7 @@ public class MainFrame extends javax.swing.JFrame {
         loadSubject(Information.subjects);
     }
 
+    //make what user can touch or not
     private void enableStuff(Boolean identify, Boolean allElse){
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
@@ -52,31 +53,38 @@ public class MainFrame extends javax.swing.JFrame {
         this.isOK.setEnabled(allElse);
     }
 
-    private void saveCheck(ActionEvent actionEvent){
+    //check if something is not save
+    private boolean saveCheck(ActionEvent actionEvent){
         if(isForEdit || isForNew){
             int option = JOptionPane.showConfirmDialog(null, "Action not save, do you want to save");
-            if(option == JOptionPane.YES_OPTION) save(actionEvent);
-            else{
+            if (option == JOptionPane.YES_OPTION){
+                save(actionEvent);
+            } else if(option == JOptionPane.NO_OPTION){
                 isForNew = isForEdit = false;
                 enableStuff(false, false);
-            }
+            } else return option != JOptionPane.CANCEL_OPTION && option != JOptionPane.CLOSED_OPTION;
         }
+        return true;
     }
 
     private void btnNewAction(ActionEvent actionEvent){
-        this.saveCheck(actionEvent);
+        if(!saveCheck(null)) return;
         this.isForEdit = false;
         this.isForNew = true;
+        this.txtLearningHours.setText("");
+        this.txtEmail.setText("");
+        this.txtName.setText("");
         enableStuff(true, true);
     }
 
     private void btnEditAction(ActionEvent actionEvent){
-        this.saveCheck(actionEvent);
+        if(!saveCheck(null)) return;
         this.isForNew = false;
         this.isForEdit = true;
         enableStuff(false, true);
     }
 
+    //check if there is something need to save and write data model to nah.csv file
     private void save(ActionEvent actionEvent) {
         if(isForNew){
             saveNewStudent();
@@ -85,17 +93,21 @@ public class MainFrame extends javax.swing.JFrame {
         }
         FileDAO.writeCSVFile("nah.csv", information.getInfo());
     }
+
+    //delete student from data model and tree model
     private void deleteStudent(ActionEvent actionEvent) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student) {
             Student student = (Student) node.getUserObject();
             int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + student.getFullName() + " student?");
             if (option == JOptionPane.YES_OPTION) {
-                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-                Subject subject = (Subject) parent.getUserObject();
+                DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
+
                 DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
-                model.removeNodeFromParent(node);
-                subject.getListOfStudent().remove(student);
+                model.removeNodeFromParent(node); //delete from tree model
+
+                Subject subject = (Subject) subjectNode.getUserObject();
+                subject.getListOfStudent().remove(student); //delete from data model
                 this.jScrollPane1.repaint();
             }
         }else{
@@ -103,6 +115,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    //get selected student and update them
     private void updateStudent() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student){
@@ -127,15 +140,18 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Please choose a student");
     }
 
+    //get new student then add to tree model(root) and add to data model
     private void saveNewStudent() {
         Student student = getStudent();
         if (student == null) return;
 
+        //add student to data model
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
         List<Subject> subjects = information.getInfo().get(campus);
         Subject subject = subjects.get(cbxSubject.getSelectedIndex());
         subject.getListOfStudent().add(student);
 
+        //add student to tree model
         DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) root.getChildAt(campuses.indexOf(campus)).getChildAt(subjects.indexOf(subject));
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
         subjectNode.add(node);
@@ -147,6 +163,7 @@ public class MainFrame extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Add Student successfully");
     }
 
+    //Make a new student from text field data
     private Student getStudent() {
         Student student = null;
         try{
@@ -186,19 +203,21 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void treeSelected(TreeSelectionEvent event) {
-        saveCheck(null);
+        if(!saveCheck(null)) return;
         TreePath selectionPath = jTree1.getSelectionPath();
         if (selectionPath == null) return;
 
         Object[] path = selectionPath.getPath();
         if (path.length < 4) return;
         ArrayList<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
+        //change cast raw object to DTModel
         for (Object o : path) treeNodes.add((DefaultMutableTreeNode) o);
 
         Campus instantCampus = null;
         Subject instantSubject = null;
         Student instantStudent = null;
-        if (treeNodes.get(1).getUserObject() instanceof Campus) instantCampus = (Campus) treeNodes.get(1).getUserObject();
+        //cast to true form of object
+        if (treeNodes.get(1).getUserObject() instanceof Campus)  instantCampus = (Campus) treeNodes.get(1).getUserObject();
         if (treeNodes.get(2).getUserObject() instanceof Subject) instantSubject = (Subject) treeNodes.get(2).getUserObject();
         if (treeNodes.get(3).getUserObject() instanceof Student) instantStudent = (Student) treeNodes.get(3).getUserObject();
 
@@ -416,9 +435,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
-
 
     /**
      * @param args the command line arguments

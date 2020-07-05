@@ -5,6 +5,8 @@
  */
 package DTO;
 
+import javax.swing.*;
+
 /**
  *
  * @author user
@@ -120,6 +122,8 @@ public class Student {
     }
 
     public static void main(String[] args) {
+
         System.out.println("Not OK".matches("(Not )?OK"));
+        JOptionPane.showConfirmDialog(null, "nah0");
     }
 }

@@ -41,15 +41,16 @@ public class Information {
         subjects.addAll(list);
         info.put(campus, subjects);
     }
-    //you can add any method to finish this assignment.
+
+    //load all student from FILE_NAME to appropriate place for them(their campus and subject)
     public void getData(){
         List<Student> students = FileDAO.LoadStudentFromFile(FILE_NAME);
         for (Campus campus : campuses) {
             List<Subject> list = new ArrayList<>();
-            for (Subject subject : subjects) {
-                Subject subject1 = new Subject(subject.getName());
+            for (Subject subjectTemp : subjects) {
+                Subject subject1 = new Subject(subjectTemp.getName()); // a campus may not have all the subject
                 for (Student student : students)
-                    if (student.getExternalId().contains(subject.getName()) &&
+                    if (student.getExternalId().contains(subjectTemp.getName()) &&
                             student.getExternalId().contains(campus.getName()))
                         subject1.getListOfStudent().add(student);
                 if(!subject1.getListOfStudent().isEmpty())
@@ -58,6 +59,8 @@ public class Information {
             this.addCampus(campus,list);
         }
     }
+
+    //print info to some output stream
     public void printInfo(OutputStream stream){
         System.out.println("1");
         PrintWriter writer = new PrintWriter(stream);
