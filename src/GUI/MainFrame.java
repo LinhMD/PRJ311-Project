@@ -13,7 +13,6 @@ import DTO.Subject;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
@@ -42,6 +41,36 @@ public class MainFrame extends javax.swing.JFrame {
         loadTreeModel();
         loadCampus();
         loadSubject(Information.subjects);
+    }
+
+    private void loadTreeModel(){
+        HashMap<Campus, List<Subject>> info = information.getInfo();
+        campuses.addAll(info.keySet());
+        for (Campus campus : campuses) {
+            DefaultMutableTreeNode campusNode = new DefaultMutableTreeNode(campus);
+            root.add(campusNode);
+            for (Subject subject : info.get(campus)) {
+                DefaultMutableTreeNode subjectNode = new DefaultMutableTreeNode(subject);
+                campusNode.add(subjectNode);
+                for (Student student : subject.getListOfStudent()) {
+                    DefaultMutableTreeNode studentNode = new DefaultMutableTreeNode(student);
+                    subjectNode.add(studentNode);
+                }
+            }
+        }
+        this.jTree1.setModel(new DefaultTreeModel(root));
+    }
+
+    private void loadCampus(){
+        Vector<String> campusName = new Vector<>();
+        for (Campus campus : campuses) campusName.add(campus.getName());
+        this.cbxCampus.setModel(new DefaultComboBoxModel<>(campusName));
+    }
+
+    private void loadSubject(List<Subject> subjects){
+        Vector<String> subjectName = new Vector<>();
+        for (Subject subject : subjects) subjectName.add(subject.getName());
+        this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjectName));
     }
 
     //make what user can touch or not
@@ -106,12 +135,11 @@ public class MainFrame extends javax.swing.JFrame {
             Student student = (Student) node.getUserObject();
             int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + student.getFullName() + " student?");
             if (option == JOptionPane.YES_OPTION) {
-                DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
-
                 DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
                 model.removeNodeFromParent(node); //delete from tree model
                 this.jScrollPane1.repaint();
 
+                DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) subjectNode.getUserObject();
                 subject.getListOfStudent().remove(student); //delete from data model
             }
@@ -156,11 +184,12 @@ public class MainFrame extends javax.swing.JFrame {
         Subject subject = subjects.get(cbxSubject.getSelectedIndex());
         subject.getListOfStudent().add(student);
 
-        //add student to tree model
+        //add new student node to tree model
         DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) root.getChildAt(campuses.indexOf(campus)).getChildAt(subjects.indexOf(subject));
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
         subjectNode.add(node);
 
+        //set selected path to newly add node
         DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
         TreeNode[] pathToRoot = model.getPathToRoot(node);
         TreePath path = new TreePath(pathToRoot);
@@ -194,24 +223,7 @@ public class MainFrame extends javax.swing.JFrame {
         return student;
     }
 
-    private void loadTreeModel(){
-        HashMap<Campus, List<Subject>> info = information.getInfo();
-        campuses.addAll(info.keySet());
-        for (Campus campus : campuses) {
-            DefaultMutableTreeNode campusNode = new DefaultMutableTreeNode(campus);
-            root.add(campusNode);
-            for (Subject subject : info.get(campus)) {
-                DefaultMutableTreeNode subjectNode = new DefaultMutableTreeNode(subject);
-                campusNode.add(subjectNode);
-                for (Student student : subject.getListOfStudent()) {
-                    DefaultMutableTreeNode studentNode = new DefaultMutableTreeNode(student);
-                    subjectNode.add(studentNode);
-                }
-            }
-        }
-        this.jTree1.setModel(new DefaultTreeModel(root));
-    }
-
+    //when ever a new student is selected load that student info to frame
     private void treeSelected(TreeSelectionEvent event) {
         if(!saveCheck(null)) return;
         TreePath selectionPath = jTree1.getSelectionPath();
@@ -220,9 +232,10 @@ public class MainFrame extends javax.swing.JFrame {
         Object[] path = selectionPath.getPath();
         if (path.length < 4) return;
         ArrayList<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
-        //change cast raw object to DTModel
+        //cast raw object to DMTModel
         for (Object o : path) treeNodes.add((DefaultMutableTreeNode) o);
 
+        //this is selected object path
         Campus instantCampus = null;
         Subject instantSubject = null;
         Student instantStudent = null;
@@ -244,17 +257,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.loadSubject(subjects);
     }
 
-    private void loadCampus(){
-        Vector<String> campusName = new Vector<>();
-        for (Campus campus : campuses) campusName.add(campus.getName());
-        this.cbxCampus.setModel(new DefaultComboBoxModel<>(campusName));
-    }
-
-    private void loadSubject(List<Subject> subjects){
-        Vector<String> subjectName = new Vector<>();
-        for (Subject subject : subjects) subjectName.add(subject.getName());
-        this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjectName));
-    }
 
     private void loadStudentInfo(Student student){
         if(student != null){
@@ -442,7 +444,6 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(btnCancel))
                 .addContainerGap(80, Short.MAX_VALUE))
         );
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
