@@ -13,8 +13,10 @@ import DTO.Subject;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -43,7 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     //make what user can touch or not
-    private void enableStuff(Boolean identify, Boolean allElse){
+    private void enableStuff(Boolean identify, Boolean allElse, Boolean treeModel){
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
         this.cbxSubject.setEnabled(identify);
@@ -51,6 +53,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.txtLearningHours.setEnabled(allElse);
         this.isOK.setEnabled(allElse);
+
+        this.jTree1.setEnabled(treeModel);
     }
 
     //check if something is not save
@@ -61,7 +65,7 @@ public class MainFrame extends javax.swing.JFrame {
                 save(actionEvent);
             } else if(option == JOptionPane.NO_OPTION){
                 isForNew = isForEdit = false;
-                enableStuff(false, false);
+                enableStuff(false, false, true);
             } else return option != JOptionPane.CANCEL_OPTION && option != JOptionPane.CLOSED_OPTION;
         }
         return true;
@@ -71,17 +75,18 @@ public class MainFrame extends javax.swing.JFrame {
         if(!saveCheck(null)) return;
         this.isForEdit = false;
         this.isForNew = true;
+
         this.txtLearningHours.setText("");
         this.txtEmail.setText("");
         this.txtName.setText("");
-        enableStuff(true, true);
+        enableStuff(true, true, false);
     }
 
     private void btnEditAction(ActionEvent actionEvent){
         if(!saveCheck(null)) return;
         this.isForNew = false;
         this.isForEdit = true;
-        enableStuff(false, true);
+        enableStuff(false, true, false);
     }
 
     //check if there is something need to save and write data model to nah.csv file
@@ -105,10 +110,10 @@ public class MainFrame extends javax.swing.JFrame {
 
                 DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
                 model.removeNodeFromParent(node); //delete from tree model
+                this.jScrollPane1.repaint();
 
                 Subject subject = (Subject) subjectNode.getUserObject();
                 subject.getListOfStudent().remove(student); //delete from data model
-                this.jScrollPane1.repaint();
             }
         }else{
             JOptionPane.showMessageDialog(null, "Please select a student");
@@ -130,7 +135,7 @@ public class MainFrame extends javax.swing.JFrame {
                 student.setTotalLearning(hours);
                 student.setStatus(status);
 
-                enableStuff(false, false);
+                enableStuff(false, false, true);
                 isForEdit = isForNew = false;
                 JOptionPane.showMessageDialog(null,"Update successfully");
             }catch (NumberFormatException e){
@@ -156,9 +161,14 @@ public class MainFrame extends javax.swing.JFrame {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
         subjectNode.add(node);
 
+        DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+        TreeNode[] pathToRoot = model.getPathToRoot(node);
+        TreePath path = new TreePath(pathToRoot);
+        jTree1.setSelectionPath(path);
+
         this.jScrollPane1.repaint();
         isForEdit = isForNew = false;
-        enableStuff(false, false);
+        enableStuff(false, false, true);
 
         JOptionPane.showMessageDialog(null, "Add Student successfully");
     }
