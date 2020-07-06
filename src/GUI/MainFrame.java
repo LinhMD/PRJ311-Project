@@ -73,7 +73,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjectName));
     }
 
-    //make what user can touch or not
+    /**make what user can touch or not */
     private void enableStuff(Boolean identify, Boolean allElse, Boolean treeModel){
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTree1.setEnabled(treeModel);
     }
 
-    //check if something is not save
+    /** check if something is not save */
     private boolean saveCheck(ActionEvent actionEvent){
         if(isForEdit || isForNew){
             int option = JOptionPane.showConfirmDialog(null, "Action not save, do you want to save");
@@ -118,7 +118,7 @@ public class MainFrame extends javax.swing.JFrame {
         enableStuff(false, true, false);
     }
 
-    //check if there is something need to save and write data model to nah.csv file
+    /**check if there is something need to save and write data model to nah.csv file*/
     private void save(ActionEvent actionEvent) {
         if(isForNew){
             saveNewStudent();
@@ -128,7 +128,7 @@ public class MainFrame extends javax.swing.JFrame {
         FileDAO.writeCSVFile("nah.csv", information.getInfo());
     }
 
-    //delete student from data model and tree model
+    /**delete student from data model and tree model*/
     private void deleteStudent(ActionEvent actionEvent) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student) {
@@ -148,7 +148,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    //get selected student and update them
+    /**get selected student and update them*/
     private void updateStudent() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student){
@@ -162,7 +162,6 @@ public class MainFrame extends javax.swing.JFrame {
                     status = "Not OK";
                 student.setTotalLearning(hours);
                 student.setStatus(status);
-
                 enableStuff(false, false, true);
                 isForEdit = isForNew = false;
                 JOptionPane.showMessageDialog(null,"Update successfully");
@@ -173,7 +172,7 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Please choose a student");
     }
 
-    //get new student then add to tree model(root) and add to data model
+    /**get new student then add to tree model(root) and add to data model */
     private void saveNewStudent() {
         Student student = getStudent();
         if (student == null) return;
@@ -202,7 +201,7 @@ public class MainFrame extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Add Student successfully");
     }
 
-    //Make a new student from text field data
+    /**Make a new student from text field data */
     private Student getStudent() {
         Student student = null;
         try{
@@ -223,7 +222,7 @@ public class MainFrame extends javax.swing.JFrame {
         return student;
     }
 
-    //when ever a new student is selected load that student info to frame
+    /**when ever a new student is selected load that student info to frame*/
     private void treeSelected(TreeSelectionEvent event) {
         if(!saveCheck(null)) return;
         TreePath selectionPath = jTree1.getSelectionPath();
@@ -251,12 +250,14 @@ public class MainFrame extends javax.swing.JFrame {
         this.loadStudentInfo(instantStudent);
     }
 
+    /**
+     * everytime a new campus is selected load it subject list to cbxSubject
+     **/
     private void campusSelected(ActionEvent actionEvent) {
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
         List<Subject> subjects = information.getInfo().get(campus);
         this.loadSubject(subjects);
     }
-
 
     private void loadStudentInfo(Student student){
         if(student != null){
