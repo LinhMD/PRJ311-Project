@@ -37,4 +37,23 @@ public class InvoiceDetail{
 		this.service = service;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		InvoiceDetail that = (InvoiceDetail) o;
+
+		if (!Objects.equals(invoice, that.invoice)) return false;
+		if (!Objects.equals(pet, that.pet)) return false;
+		return Objects.equals(service, that.service);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = invoice != null ? invoice.hashCode() : 0;
+		result = 31 * result + (pet != null ? pet.hashCode() : 0);
+		result = 31 * result + (service != null ? service.hashCode() : 0);
+		return result;
+	}
 }

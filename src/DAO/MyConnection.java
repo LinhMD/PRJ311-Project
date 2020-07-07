@@ -17,7 +17,7 @@ import java.sql.SQLException;
 public class MyConnection {
     public static Connection makeConnection(){
         try {
-            Class<?> aClass = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Health History Report";
             return DriverManager.getConnection(url, "sa", "123456");
         } catch (ClassNotFoundException | SQLException e) {
