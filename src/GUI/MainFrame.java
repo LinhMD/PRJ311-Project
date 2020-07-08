@@ -6,17 +6,11 @@
 package GUI;
 
 import DAO.FileDAO;
-import DTO.Campus;
-import DTO.Information;
-import DTO.Student;
-import DTO.Subject;
+import DTO.*;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
@@ -27,7 +21,7 @@ import java.util.*;
 public class MainFrame extends javax.swing.JFrame {
     Information information = new Information(); //data model?
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root"); //tree model, use for jTree(show to user)
-    ArrayList<Campus> campuses = new ArrayList<>(); //key set of info but have index .-.
+    Vector<Campus> campuses = new Vector<>(); //key set of info but have index .-.
 
     boolean isForNew = false;
     boolean isForEdit = false;
@@ -62,24 +56,20 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void loadCampus(){
-        Vector<String> campusName = new Vector<>();
-        for (Campus campus : campuses) campusName.add(campus.getName());
-        this.cbxCampus.setModel(new DefaultComboBoxModel<>(campusName));
+        this.cbxCampus.setModel(new DefaultComboBoxModel<>(campuses));
     }
 
-    private void loadSubject(List<Subject> subjects){
-        Vector<String> subjectName = new Vector<>();
-        for (Subject subject : subjects) subjectName.add(subject.getName());
-        this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjectName));
+    private void loadSubject(Vector<Subject> subjects){
+        this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjects));
     }
 
     /**make what user can touch or not */
     private void enableStuff(Boolean identify, Boolean allElse, Boolean treeModel){
         this.txtName.setEnabled(identify);
         this.txtEmail.setEnabled(identify);
-        this.cbxSubject.setEnabled(identify);
-        this.cbxCampus.setEnabled(identify);
 
+        this.cbxSubject.setEnabled(allElse);
+        this.cbxCampus.setEnabled(allElse);
         this.txtLearningHours.setEnabled(allElse);
         this.isOK.setEnabled(allElse);
 
@@ -121,7 +111,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**check if there is something need to save and write data model to nah.csv file*/
     private void save(ActionEvent actionEvent) {
         if(isForNew){
-            saveNewStudent();
+            addNewStudent();
         }else if(isForEdit){
             updateStudent();
         }
@@ -153,27 +143,49 @@ public class MainFrame extends javax.swing.JFrame {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student){
             Student student = (Student) node.getUserObject();
-            try {
-                double hours = Double.parseDouble(this.txtLearningHours.getText());
-                String status;
-                if(this.isOK.isSelected())
-                    status = "Ok";
-                else
-                    status = "Not OK";
-                student.setTotalLearning(hours);
-                student.setStatus(status);
+//            try {
+//                double hours = Double.parseDouble(this.txtLearningHours.getText());
+//                String status;
+//                if(this.isOK.isSelected())
+//                    status = "Ok";
+//                else
+//                    status = "Not OK";
+//                student.setTotalLearning(hours);
+//                student.setStatus(status);
+//                enableStuff(false, false, true);
+//                isForEdit = isForNew = false;
+//                JOptionPane.showMessageDialog(null,"Update successfully");
+//            }catch (NumberFormatException e){
+//                JOptionPane.showMessageDialog(null, "Learning hours invalid");
+//            }
+            Student newStudent = getStudent();
+            if(newStudent == null) return;
+
+            if(newStudent.getExternalId().equalsIgnoreCase(student.getExternalId())){
+                //if student didn't move to new campus or subject
+                student.setStatus(newStudent.getStatus());
+                student.setTotalLearning(newStudent.getTotalLearning());
                 enableStuff(false, false, true);
                 isForEdit = isForNew = false;
                 JOptionPane.showMessageDialog(null,"Update successfully");
-            }catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null, "Learning hours invalid");
+            }else{
+                //if student move to new campus and subject
+                //delete student from data model:
+                DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
+                Subject subject = (Subject) subjectNode.getUserObject();
+                subject.getListOfStudent().remove(student);
+                //delete student from tree model:
+                DefaultTreeModel treeModel = (DefaultTreeModel) jTree1.getModel();
+                treeModel.removeNodeFromParent(node);
+                //add newStudent to data model and tree model
+                addNewStudent();
             }
         }else
             JOptionPane.showMessageDialog(null, "Please choose a student");
     }
 
     /**get new student then add to tree model(root) and add to data model */
-    private void saveNewStudent() {
+    private void addNewStudent() {
         Student student = getStudent();
         if (student == null) return;
 
@@ -194,11 +206,14 @@ public class MainFrame extends javax.swing.JFrame {
         TreePath path = new TreePath(pathToRoot);
         jTree1.setSelectionPath(path);
 
+        if(isForNew)
+            JOptionPane.showMessageDialog(null, "Add Student successfully");
+        else if(isForEdit)
+            JOptionPane.showMessageDialog(null, "Update Student successfully");
+
         this.jScrollPane1.repaint();
         isForEdit = isForNew = false;
         enableStuff(false, false, true);
-
-        JOptionPane.showMessageDialog(null, "Add Student successfully");
     }
 
     /**Make a new student from text field data */
@@ -244,7 +259,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (treeNodes.get(3).getUserObject() instanceof Student) instantStudent = (Student) treeNodes.get(3).getUserObject();
 
         this.cbxCampus.setSelectedIndex(campuses.indexOf(instantCampus));
-        List<Subject> subjects = information.getInfo().get(instantCampus);
+        Vector<Subject> subjects = (Vector<Subject>) information.getInfo().get(instantCampus);
         this.loadSubject(subjects);
         this.cbxSubject.setSelectedIndex(subjects.indexOf(instantSubject));
         this.loadStudentInfo(instantStudent);
@@ -255,7 +270,7 @@ public class MainFrame extends javax.swing.JFrame {
      **/
     private void campusSelected(ActionEvent actionEvent) {
         Campus campus = campuses.get(cbxCampus.getSelectedIndex());
-        List<Subject> subjects = information.getInfo().get(campus);
+        Vector<Subject> subjects = (Vector<Subject>) information.getInfo().get(campus);
         this.loadSubject(subjects);
     }
 
@@ -467,8 +482,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSave;
-    private javax.swing.JComboBox<String> cbxCampus;
-    private javax.swing.JComboBox<String> cbxSubject;
+    private javax.swing.JComboBox<Campus> cbxCampus;
+    private javax.swing.JComboBox<Subject> cbxSubject;
     private javax.swing.JRadioButton isOK;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

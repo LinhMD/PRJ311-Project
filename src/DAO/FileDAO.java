@@ -39,7 +39,7 @@ public class FileDAO {
                 e.printStackTrace();
             }
         }
-        return new ArrayList<>(campus);
+        return new Vector<>(campus);
     }
     public static List<Subject> LoadSubjectFromFile(String filename)
     {
@@ -61,7 +61,7 @@ public class FileDAO {
                 e.printStackTrace();
             }
         }
-        return new ArrayList<>(subjects);
+        return new Vector<>(subjects);
     }
     public static List<Student> LoadStudentFromFile(String filename)
     {
@@ -74,7 +74,7 @@ public class FileDAO {
                 String[] arr = reader.readLine().split(",");
                 try{
 
-                    students.add( new Student(arr[1], arr[2], arr[3], arr[4], Double.parseDouble(arr[6]), arr[7]));
+                    students.add(new Student(arr[1], arr[2], arr[3], arr[4], Double.parseDouble(arr[6]), arr[7]));
                 } catch (Exception e){
 //                    System.out.println(arr[7]);
                     e.printStackTrace();

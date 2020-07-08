@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 /**
  *
@@ -20,8 +21,8 @@ public class Information {
     private final HashMap<Campus,List<Subject>> info;
 
     public static String FILE_NAME = "nah.csv";
-    public static List<Campus> campuses = FileDAO.loadCampusFromFile(FILE_NAME);
-    public static List<Subject> subjects = FileDAO.LoadSubjectFromFile(FILE_NAME);
+    public static Vector<Campus> campuses = (Vector<Campus>) FileDAO.loadCampusFromFile(FILE_NAME);
+    public static Vector<Subject> subjects = (Vector<Subject>) FileDAO.LoadSubjectFromFile(FILE_NAME);
 
     public Information() {
         info =new HashMap<>();
