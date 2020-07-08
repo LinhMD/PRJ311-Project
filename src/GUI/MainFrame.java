@@ -36,7 +36,7 @@ public class MainFrame extends javax.swing.JFrame {
         loadCampus();
         loadSubject(Information.subjects);
     }
-
+    /**load data model to tree model*/
     private void loadTreeModel(){
         HashMap<Campus, List<Subject>> info = information.getInfo();
         campuses.addAll(info.keySet());
@@ -55,10 +55,11 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTree1.setModel(new DefaultTreeModel(root));
     }
 
+    /**load all campus to cbxCampus*/
     private void loadCampus(){
         this.cbxCampus.setModel(new DefaultComboBoxModel<>(campuses));
     }
-
+    /**load input subject to cbxSubject*/
     private void loadSubject(Vector<Subject> subjects){
         this.cbxSubject.setModel(new DefaultComboBoxModel<>(subjects));
     }
@@ -125,14 +126,15 @@ public class MainFrame extends javax.swing.JFrame {
             Student student = (Student) node.getUserObject();
             int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + student.getFullName() + " student?");
             if (option == JOptionPane.YES_OPTION) {
-                DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
-                model.removeNodeFromParent(node); //delete from tree model
-                this.jScrollPane1.repaint();
-
                 DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) subjectNode.getUserObject();
                 subject.getListOfStudent().remove(student); //delete from data model
+
+                DefaultTreeModel model = (DefaultTreeModel) this.jTree1.getModel();
+                model.removeNodeFromParent(node); //delete from tree model
+                this.jScrollPane1.repaint();
             }
+            JOptionPane.showMessageDialog(null, "Delete student successfully");
         }else{
             JOptionPane.showMessageDialog(null, "Please select a student");
         }
@@ -160,7 +162,7 @@ public class MainFrame extends javax.swing.JFrame {
 //            }
             Student newStudent = getStudent();
             if(newStudent == null) return;
-
+            //this part is quite hacky but last min teacher requirement, so....
             if(newStudent.getExternalId().equalsIgnoreCase(student.getExternalId())){
                 //if student didn't move to new campus or subject
                 student.setStatus(newStudent.getStatus());
@@ -170,6 +172,10 @@ public class MainFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null,"Update successfully");
             }else{
                 //if student move to new campus and subject
+                // (this could be replace with delete old student and add new but i don't want to deal with JOptionPane message)
+
+                //add newStudent to data model and tree model
+                addNewStudent();
                 //delete student from data model:
                 DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) subjectNode.getUserObject();
@@ -177,8 +183,6 @@ public class MainFrame extends javax.swing.JFrame {
                 //delete student from tree model:
                 DefaultTreeModel treeModel = (DefaultTreeModel) jTree1.getModel();
                 treeModel.removeNodeFromParent(node);
-                //add newStudent to data model and tree model
-                addNewStudent();
             }
         }else
             JOptionPane.showMessageDialog(null, "Please choose a student");
@@ -198,21 +202,21 @@ public class MainFrame extends javax.swing.JFrame {
         //add new student node to tree model
         DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) root.getChildAt(campuses.indexOf(campus)).getChildAt(subjects.indexOf(subject));
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(student);
-        subjectNode.add(node);
-
-        //set selected path to newly add node
         DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
-        TreeNode[] pathToRoot = model.getPathToRoot(node);
-        TreePath path = new TreePath(pathToRoot);
-        jTree1.setSelectionPath(path);
+        model.insertNodeInto(node, subjectNode, subjectNode.getChildCount());
 
         if(isForNew)
             JOptionPane.showMessageDialog(null, "Add Student successfully");
         else if(isForEdit)
             JOptionPane.showMessageDialog(null, "Update Student successfully");
-
-        this.jScrollPane1.repaint();
         isForEdit = isForNew = false;
+        //set selected path to newly add node
+
+        TreeNode[] pathToRoot = model.getPathToRoot(node);
+        TreePath path = new TreePath(pathToRoot);
+        jTree1.setSelectionPath(path);
+        this.jScrollPane1.repaint();
+
         enableStuff(false, false, true);
     }
 
@@ -226,8 +230,10 @@ public class MainFrame extends javax.swing.JFrame {
             String campus = Objects.requireNonNull(this.cbxCampus.getSelectedItem()).toString();
             String subject = Objects.requireNonNull(this.cbxSubject.getSelectedItem()).toString();
             String status;
-            if (this.isOK.isSelected()) status = "Ok";
-            else status = "Not Ok";
+            if(this.isOK.isSelected())
+                status = "Ok";
+            else
+                status = "Not OK";
             String externalId =  subject + "-" + campus + "-" + Student.getStudentID(name);
 
             student = new Student(name, email, externalId, campus, hours, status);
@@ -257,7 +263,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (treeNodes.get(1).getUserObject() instanceof Campus)  instantCampus = (Campus) treeNodes.get(1).getUserObject();
         if (treeNodes.get(2).getUserObject() instanceof Subject) instantSubject = (Subject) treeNodes.get(2).getUserObject();
         if (treeNodes.get(3).getUserObject() instanceof Student) instantStudent = (Student) treeNodes.get(3).getUserObject();
-
+        //UX
         this.cbxCampus.setSelectedIndex(campuses.indexOf(instantCampus));
         Vector<Subject> subjects = (Vector<Subject>) information.getInfo().get(instantCampus);
         this.loadSubject(subjects);

@@ -5,8 +5,9 @@
  */
 package DTO;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Vector;
 
 /**
  *
@@ -30,7 +31,7 @@ public class Subject implements Comparable<Subject>{
 
     public Subject( String Name) {
         this.Name = Name;
-        this.listOfStudent = new ArrayList<>();
+        this.listOfStudent = new Vector<>();
     }
 
 

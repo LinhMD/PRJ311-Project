@@ -8,7 +8,6 @@ package DTO;
 import DAO.FileDAO;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -38,7 +37,7 @@ public class Information {
         if(info.containsKey(campus))
             subjects = info.get(campus);
         else
-            subjects = new ArrayList<>();
+            subjects = new Vector<>();
         subjects.addAll(list);
         info.put(campus, subjects);
     }
@@ -47,7 +46,7 @@ public class Information {
     public void getData(){
         List<Student> students = FileDAO.LoadStudentFromFile(FILE_NAME);
         for (Campus campus : campuses) {
-            List<Subject> list = new ArrayList<>();
+            List<Subject> list = new Vector<>();
             for (Subject subjectTemp : subjects) {
                 Subject subject1 = new Subject(subjectTemp.getName()); // a campus may not have all the subject
                 for (Student student : students)
