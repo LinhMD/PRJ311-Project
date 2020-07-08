@@ -112,7 +112,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**check if there is something need to save and write data model to nah.csv file*/
     private void save(ActionEvent actionEvent) {
         if(isForNew){
-            addNewStudent();
+            addNewStudent(getStudent());
         }else if(isForEdit){
             updateStudent();
         }
@@ -145,21 +145,6 @@ public class MainFrame extends javax.swing.JFrame {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if (node.getUserObject() instanceof Student){
             Student student = (Student) node.getUserObject();
-//            try {
-//                double hours = Double.parseDouble(this.txtLearningHours.getText());
-//                String status;
-//                if(this.isOK.isSelected())
-//                    status = "Ok";
-//                else
-//                    status = "Not OK";
-//                student.setTotalLearning(hours);
-//                student.setStatus(status);
-//                enableStuff(false, false, true);
-//                isForEdit = isForNew = false;
-//                JOptionPane.showMessageDialog(null,"Update successfully");
-//            }catch (NumberFormatException e){
-//                JOptionPane.showMessageDialog(null, "Learning hours invalid");
-//            }
             Student newStudent = getStudent();
             if(newStudent == null) return;
             //this part is quite hacky but last min teacher requirement, so....
@@ -173,9 +158,8 @@ public class MainFrame extends javax.swing.JFrame {
             }else{
                 //if student move to new campus and subject
                 // (this could be replace with delete old student and add new but i don't want to deal with JOptionPane message)
-
                 //add newStudent to data model and tree model
-                addNewStudent();
+                addNewStudent(getStudent());
                 //delete student from data model:
                 DefaultMutableTreeNode subjectNode = (DefaultMutableTreeNode) node.getParent();
                 Subject subject = (Subject) subjectNode.getUserObject();
@@ -189,8 +173,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     /**get new student then add to tree model(root) and add to data model */
-    private void addNewStudent() {
-        Student student = getStudent();
+    private void addNewStudent(Student student) {
         if (student == null) return;
 
         //add student to data model
